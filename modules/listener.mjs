@@ -41,10 +41,8 @@ export class JLASListener {
       if ( !scene.journal.testUserPermission(game.user, "LIMITED") ) {
         return ui.notifications.warn(`You do not have permission to view this: ${scene.journal.documentName}`);
       };
+      scene.journal.sheet.render(true);
     };
-
-    // Render the scene notes, if any.
-    return scene.journal.sheet.render(true);
   }
 
   /**
@@ -73,9 +71,7 @@ export class JLASListener {
       if ( !scene.journal.testUserPermission(game.user, "LIMITED") ) {
         return ui.notifications.warn(`You do not have permission to view this: ${scene.journal.documentName}`);
       };
+      scene.journal.sheet.render(true);
     };
-
-    // Render the scene notes, if any.
-    return scene.journal.sheet.render(true);
   }
 }
