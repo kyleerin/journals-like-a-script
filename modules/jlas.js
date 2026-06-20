@@ -1,5 +1,5 @@
-// Import the extended text editor.
 import { JLASListener } from "./listener.mjs";
+import { openSceneLinkDialog } from "./SceneLinkDialog.mjs";
 
 /* -------------------------------------------- */
 /*  Module Initialization                  */
@@ -114,4 +114,23 @@ Hooks.once("init", async function() {
 
   JLASListener.activateListeners();
 
+});
+
+/* -------------------------------------------- */
+/*  Journal Editor Toolbar Button               */
+/* -------------------------------------------- */
+
+Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
+  if (!sheet.isEditable) return;
+  const menu = html.find("menu");
+  if (!menu.length) return;
+
+  const li = $(`<li>
+    <button type="button" class="jlas-insert-scene-btn" title="Insert Scene Link" data-tooltip="Insert Scene Link">
+      <i class="fas fa-map"></i>
+    </button>
+  </li>`);
+
+  li.find("button").on("click", () => openSceneLinkDialog(sheet));
+  menu.append(li);
 });
