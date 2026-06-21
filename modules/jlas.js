@@ -121,9 +121,21 @@ Hooks.once("init", async function() {
 /* -------------------------------------------- */
 
 Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
-  if (!sheet.isEditable) return;
+  console.log("JLAS | renderJournalTextPageSheet fired. sheet:", sheet);
+  console.log("JLAS | sheet.isEditable:", sheet.isEditable);
+
+  if (!sheet.isEditable) {
+    console.log("JLAS | Sheet is not editable, skipping toolbar button.");
+    return;
+  }
+
   const menu = html.find("menu");
-  if (!menu.length) return;
+  console.log("JLAS | <menu> elements found:", menu.length, menu);
+
+  if (!menu.length) {
+    console.warn("JLAS | No <menu> element found in journal page sheet — toolbar button not added.");
+    return;
+  }
 
   const li = $(`<li>
     <button type="button" class="jlas-insert-scene-btn" title="Insert Scene Link" data-tooltip="Insert Scene Link">
@@ -131,6 +143,10 @@ Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
     </button>
   </li>`);
 
-  li.find("button").on("click", () => openSceneLinkDialog(sheet));
+  li.find("button").on("click", () => {
+    console.log("JLAS | Toolbar button clicked.");
+    openSceneLinkDialog(sheet);
+  });
   menu.append(li);
+  console.log("JLAS | Toolbar button appended to <menu>.");
 });

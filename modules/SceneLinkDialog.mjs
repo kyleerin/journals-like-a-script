@@ -1,7 +1,13 @@
 export function openSceneLinkDialog(sheet) {
+  console.log("JLAS | openSceneLinkDialog called. sheet:", sheet);
+  console.log("JLAS | sheet.editors:", sheet.editors);
+  console.log("JLAS | sheet.isEditable:", sheet.isEditable);
+
   const scenes = game.scenes.contents
     .map(s => ({ id: s.id, name: s.name }))
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  console.log(`JLAS | Found ${scenes.length} scenes.`);
 
   if (!scenes.length) {
     return ui.notifications.warn("JLAS | No scenes found in this world.");
@@ -58,12 +64,15 @@ export function openSceneLinkDialog(sheet) {
           const linkText = html.find("[name=linkText]").val().trim()
             || game.scenes.get(sceneId)?.name
             || sceneId;
-          _insertIntoEditor(sheet, `@${linkType}[${sceneId}]{${linkText}}`);
+          const syntax = `@${linkType}[${sceneId}]{${linkText}}`;
+          console.log(`JLAS | Inserting syntax: ${syntax}`);
+          _insertIntoEditor(sheet, syntax);
         }
       },
       cancel: { icon: '<i class="fas fa-times"></i>', label: "Cancel" }
     },
     render: html => {
+      console.log("JLAS | Dialog rendered.");
       const search   = html.find("#jlas-search");
       const list     = html.find("#jlas-scene-list");
       const linkText = html.find("[name=linkText]");
@@ -91,18 +100,28 @@ export function openSceneLinkDialog(sheet) {
 }
 
 function _insertIntoEditor(sheet, text) {
-  // Foundry v10 stores editors in sheet.editors, keyed by field name
+  console.log("JLAS | _insertIntoEditor called. text:", text);
+  console.log("JLAS | sheet.editors:", sheet.editors);
+
   let view;
-  for (const ed of Object.values(sheet.editors ?? {})) {
+  for (const [key, ed] of Object.entries(sheet.editors ?? {})) {
+    console.log(`JLAS | Checking editor key "${key}":`, ed);
+    console.log(`JLAS |   ed.instance:`, ed.instance);
+    console.log(`JLAS |   ed.instance?.view:`, ed.instance?.view);
     if (ed.instance?.view) { view = ed.instance.view; break; }
   }
 
   if (!view) {
+    console.error("JLAS | No ProseMirror view found. Full sheet.editors dump:", sheet.editors);
     ui.notifications.warn("JLAS | Editor not ready — make sure you are in edit mode.");
     return;
   }
 
+  console.log("JLAS | Found ProseMirror view:", view);
+  console.log("JLAS | Current selection:", view.state.selection);
+
   const { state, dispatch } = view;
   dispatch(state.tr.insertText(text));
   view.focus();
+  console.log("JLAS | Text inserted.");
 }
