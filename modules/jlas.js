@@ -40,10 +40,6 @@ Hooks.once("init", async function() {
   // Establish the base enricher.
   const jlas_enricher = (match, {activate = true, cls = "jlas-activate-scene"}={}) => {
     let [type, target, name] = match.slice(1, 4);
-    console.log(`JLAS | Match: ${match}`);
-    console.log(`JLAS | Type: ${type}`);
-    console.log(`JLAS | Target: ${target}`);
-    console.log(`JLAS | Name: ${name}`);
 
     // Prepare replacement data
     const data = {
@@ -89,8 +85,6 @@ Hooks.once("init", async function() {
       a.dataset[k] = v;
     };
     a.innerHTML = `<i class="${data.icon}"></i> ${data.name}`;
-    console.log("JLAS | Formed Scene link:");
-    console.log(a);
     return a;
   };
 
@@ -121,21 +115,10 @@ Hooks.once("init", async function() {
 /* -------------------------------------------- */
 
 Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
-  console.log("JLAS | renderJournalTextPageSheet fired. sheet:", sheet);
-  console.log("JLAS | sheet.isEditable:", sheet.isEditable);
-
-  if (!sheet.isEditable) {
-    console.log("JLAS | Sheet is not editable, skipping toolbar button.");
-    return;
-  }
+  if (!sheet.isEditable) return;
 
   const menu = html.find("menu");
-  console.log("JLAS | <menu> elements found:", menu.length, menu);
-
-  if (!menu.length) {
-    console.warn("JLAS | No <menu> element found in journal page sheet — toolbar button not added.");
-    return;
-  }
+  if (!menu.length) return;
 
   const li = $(`<li>
     <button type="button" class="jlas-insert-scene-btn" title="Insert Scene Link" data-tooltip="Insert Scene Link">
@@ -143,10 +126,6 @@ Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
     </button>
   </li>`);
 
-  li.find("button").on("click", () => {
-    console.log("JLAS | Toolbar button clicked.");
-    openSceneLinkDialog(sheet);
-  });
+  li.find("button").on("click", () => openSceneLinkDialog(sheet));
   menu.append(li);
-  console.log("JLAS | Toolbar button appended to <menu>.");
 });
