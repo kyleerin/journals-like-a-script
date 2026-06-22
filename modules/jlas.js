@@ -115,7 +115,12 @@ Hooks.once("init", async function() {
 /* -------------------------------------------- */
 
 Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
-  if (!sheet.isEditable) return;
+  // Foundry v13 ApplicationV2 passes an HTMLElement; older versions pass jQuery.
+  const $html = html instanceof HTMLElement ? $(html) : html;
+
+  // The <menu> element only exists when the editor is active — use it as the edit-mode guard.
+  const menu = $html.find("menu");
+  if (!menu.length) return;
 
   const li = $(`<li>
     <button type="button" class="jlas-insert-scene-btn" data-tooltip="Insert Scene Link" aria-label="Insert Scene Link">
@@ -125,12 +130,11 @@ Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
 
   li.find("button").on("click", () => openSceneLinkDialog(sheet));
 
-  // Place next to the Insert Link button so it sits with the other insert actions
-  const linkItem = html.find("button[data-action='link']").closest("li");
+  // Place next to the Insert Link button so it sits with the other insert actions.
+  const linkItem = $html.find("button[data-action='link']").closest("li");
   if (linkItem.length) {
     linkItem.after(li);
   } else {
-    const menu = html.find("menu");
-    if (menu.length) menu.append(li);
+    menu.append(li);
   }
 });
