@@ -117,15 +117,20 @@ Hooks.once("init", async function() {
 Hooks.on("renderJournalTextPageSheet", (sheet, html, _data) => {
   if (!sheet.isEditable) return;
 
-  const menu = html.find("menu");
-  if (!menu.length) return;
-
   const li = $(`<li>
-    <button type="button" class="jlas-insert-scene-btn" title="Insert Scene Link" data-tooltip="Insert Scene Link">
+    <button type="button" class="jlas-insert-scene-btn" data-tooltip="Insert Scene Link" aria-label="Insert Scene Link">
       <i class="fas fa-map"></i>
     </button>
   </li>`);
 
   li.find("button").on("click", () => openSceneLinkDialog(sheet));
-  menu.append(li);
+
+  // Place next to the Insert Link button so it sits with the other insert actions
+  const linkItem = html.find("button[data-action='link']").closest("li");
+  if (linkItem.length) {
+    linkItem.after(li);
+  } else {
+    const menu = html.find("menu");
+    if (menu.length) menu.append(li);
+  }
 });
